@@ -1,5 +1,6 @@
 // react imports
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation, gql } from "@apollo/client";
 
 // import mutation
@@ -11,6 +12,8 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 
 function CreateEventForm() {
 
+  const navigate = useNavigate();
+
   // get user data
   const { user } = useAuthenticator((context) => [context.user]);
 
@@ -20,7 +23,10 @@ function CreateEventForm() {
   const [eventDate, setEventDate] = useState('');
 
   const [createEvent, { loading, error }] = useMutation(gql(createEvents), {
-    refetchQueries: [{ query: gql(listEvents) }]
+    refetchQueries: [
+      { query: gql(listEvents) },
+      { query: gql(listEvents),  variables: { filter: { userID: { eq: user?.userId } } } },
+    ]
   });
 
   // handle submit
